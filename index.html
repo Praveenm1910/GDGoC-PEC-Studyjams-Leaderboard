@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDGOC Study Jams Leaderboard</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #4285F4;
+            --secondary-color: #0F9D58;
+            --accent-color: #F4B400;
+            --bg-color: #f9f9f9;
+            --text-color: #333;
+            --top1-color: #FFD700;
+            /* Gold */
+            --top2-color: #C0C0C0;
+            /* Silver */
+            --top3-color: #CD7F32;
+            /* Bronze */
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: var(--accent-color);
+            color: white;
+            transition: 0.2s;
+        }
+
+        /* Highlight top 3 ranks */
+        tr.rank-1 td {
+            background-color: var(--top1-color);
+            color: #000;
+            font-weight: bold;
+        }
+
+        tr.rank-2 td {
+            background-color: var(--top2-color);
+            color: #000;
+            font-weight: bold;
+        }
+
+        tr.rank-3 td {
+            background-color: var(--top3-color);
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* Responsive table (still table format on mobile) */
+        @media (max-width: 600px) {
+
+            th,
+            td {
+                padding: 8px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>GDGOC Study Jams Leaderboard Panimalar Engineering College, Chennai</h1>
+        <div id="leaderboard">Loading...</div>
+    </div>
+
+    <script>
+        // Replace this URL with your deployed Apps Script web app URL
+        const API_URL = "https://script.google.com/macros/s/AKfycbxXp5ZqMsz-0VAfH-POipk6_pK0pT1yk0KcEIo-eqLjRQUjU6sX0eRsiSVJv2c8KXtE/exec";
+
+        fetch(API_URL)
+            .then(res => res.json())
+            .then(data => {
+                const board = document.getElementById("leaderboard");
+                board.innerHTML = "";
+
+                if (data.length === 0) {
+                    board.innerText = "No data available!";
+                    return;
+                }
+
+                // Sort by Modules Completed descending
+                data.sort((a, b) => b.score - a.score);
+
+                const table = document.createElement("table");
+
+                // Table header
+                const header = table.insertRow();
+                ["Rank", "Name", "Email", "Profile", "Modules Completed", "Completed StudyJams"].forEach(text => {
+                    const th = document.createElement("th");
+                    th.innerText = text;
+                    header.appendChild(th);
+                });
+
+                // Table rows
+                data.forEach((row, index) => {
+                    const tr = table.insertRow();
+                    const rank = index + 1;
+                    const modulesCompleted = row.score; // use 'score' as modules completed
+                    const completedStudyJams = modulesCompleted === 20 ? "Yes" : "No";
+
+                    // Add rank-based class for top 3
+                    if (rank === 1) tr.classList.add("rank-1");
+                    else if (rank === 2) tr.classList.add("rank-2");
+                    else if (rank === 3) tr.classList.add("rank-3");
+
+                    const cells = [
+                        rank,
+                        row.name,
+                        row.email,
+                        row.profile,
+                        modulesCompleted,
+                        completedStudyJams
+                    ];
+
+                    cells.forEach(cell => {
+                        const td = tr.insertCell();
+                        td.innerText = cell;
+                    });
+                });
+
+                board.appendChild(table);
+            })
+            .catch(err => {
+                console.error("Error fetching:", err);
+                document.getElementById("leaderboard").innerText = "Error loading leaderboard!";
+            });
+    </script>
+</body>
+
+</html>
